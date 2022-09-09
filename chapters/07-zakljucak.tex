@@ -1,0 +1,20 @@
+\chapter{Zaključak}
+
+Pomoću programske biblioteke i grafičkog programa, ovaj rad prikazuje
+način implementacije i usporedbu triju algoritama za otkrivanje sudara
+u trodimenzionalnom prostoru.
+\\
+Prvi dio rada opisuje tehnologije korištene
+za realizaciju programske podrške, drugi dio prikazuje algoritme i optimizacije
+koje su upotrebljavane, te je na kraju prikazana njihova primjena i rezultati.
+\\
+Iz rezultata testiranja vidljiv je značajan utjecaj oba algoritma optimizacije
+u odnosu na referentni test metodom grube sile. Obje metode pokazale su poboljšanje
+performansi do nekoliko redova veličine. Vidljivo je da metoda oktalnog stabla
+u nekim slučajevima omogućava otkrivanje sudara objekata nakon samo jedne provjere,
+dok je i u slučajevima kad sudar postoji do 1000 puta brža od metode grube sile.
+\\
+Kod metode prostornog hashiranja, iako u manjoj mjeri, također su vidljiva
+značajna poboljšanja performansi. Kako prostorno hashiranje ovisi o većem broju
+parametara (veličina čelije, hash funkcija), moguće je kako bi optimizacijom
+tih parametara rezultati bili bolji.

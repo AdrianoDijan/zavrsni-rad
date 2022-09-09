@@ -1,0 +1,139 @@
+\chapter{Alati i tehnologije}
+
+\section{C++}
+
+C++ je programski jezik opće namjene, izvorno napravljen od strane Bjarnea Stroustrupa.
+Jezik je nastao kao proširenje programskog jezika C uz dodatak klasa. Moderne verzije jezika C++
+podržavaju objektno orijentirano programiranje, generičko programiranje, funkcijski orjetirano programiranje.
+Posljednja stabilna verzija standarda ovog programskog jezika je C++20, koji je korišten za izradu ovog rada.~\cite{cpp}
+
+\section{Qt}
+
+Qt je višeplatformsko okruženje za razvoj grafičkih sučelja i višeplatformskih GUI aplikacija.
+Omogučava izradu grafičkih sučelja aplikacija za različite platforme uz korištenje standardnog API-ja.
+Qt3D, jedna od bibilioteka Qt paketa, pruza mogučnost izrade 3D grafičkih aplikacija. Napisan je u jeziku C++.~\cite{qt}
+Pri izradi rada, korišten je za izradu grafičkog sučelja i 3D prikaza objekata nad kojima se izvršava testiranje.
+
+\section{CMake}
+
+CMake je sustav otvorenog koda koji se koristi za automatizaciju izrade paketa, testiranje, prevođenje i instalaciju
+softvera. Koristeći posebnu sintaksu (\textit{CMakeLists.txt}) generira konfiguracijske datoteke za druge programske prevoditelje
+(MSVC, GCC, LLVM...) i razvojne okoline (Microsoft Visual Studio, Xcode...). Od verzije Qt6, podržani je način izrade Qt aplikacija. ~\cite{cmake}
+
+\pagebreak
+\section{Conan}
+
+Conan je upravitelj paketa za C/C++ programske jezike. Omogućava preuzimanje biblioteka sa javno dostupnih repozitorija
+i njihovu automatsku integraciju u programski kod. Moguće ga je integrirati sa CMake sustavom kako bi se postiglo automatsko
+prevođenje i povezivanje potrebnih biblioteka sa izvornim kodom. Koristeći datoteku \textit{conanfile.py} moguće je definirati
+skup pravila po kojima će se biblioteka ili programski paket prevoditi i pakirati, a takav paket je onda moguće koristiti lokalno
+ili ga objaviti na javno dostupnom Conan repozitoriju.
+
+\begin{pythonSource}{Primjer konfiguracijske datoteke (\textit{conanfile.py})}
+from conans import ConanFile, CMake
+
+
+class YAAACDConan(ConanFile):
+    name = "yaaacd"
+    version = "1.0"
+    settings = "os", "compiler", "arch", "build_type"
+    options = {"shared": [True, False]}
+    default_options = "shared=False"
+    generators = "cmake"
+    exports_sources = (
+        "src/*",
+        "include/*",
+        "CMakeLists.txt",
+        "test/*"
+    )
+
+        cmake.definitions["CMAKE_BUILD_TYPE"] = str(
+            self.settings.build_type
+        ).upper()
+        cmake.configure()
+        return cmake
+
+    def build(self):
+        cmake = self._configure_cmake()
+        cmake.build()
+        cmake.test()
+
+    def package(self):
+        cmake = self._configure_cmake()
+        cmake.install()
+
+    def package_info(self):
+        self.cpp_info.libs = ["yaaacd"]
+\end{pythonSource}
+
+\pagebreak
+
+\section{Catch2}
+
+Catch2 je bibilioteka korištena za testiranje C++ koda YAAACD biblioteke.
+Omogućava jednostavno pisanje jediničnih testova uz korištenje dostupnih
+\textit{macro}-a, automatsku registraciju testova i testove performansi.
+Integrira se sa CMake paketom te ga je moguće koristiti sa CTest alatom
+za testiranje.
+
+\begin{cppSource}{Primjer Catch2 jediničnog testa}
+TEST_CASE("Test octree collision", "[octree]") {
+    std::vector<Triangle> triangles;
+
+    std::vector<Vertex> vertices1{
+        Vertex(0, 0, 0),
+        Vertex(0, 0, 1),
+        Vertex(0, 1, 0),
+        Vertex(0, 1, 1),
+        Vertex(1, 0, 0),
+        Vertex(1, 0, 1),
+        Vertex(1, 1, 0),
+        Vertex(1, 1, 1),
+    };
+
+    std::vector<Vertex> vertices2;
+    std::transform(
+        vertices1.begin(),
+        vertices1.end(),
+        std::back_inserter(vertices2),
+        [](const Vertex& vertex) {
+            return Vertex(vertex.x + 0.5, vertex.y + 0.5, vertex.z + 0.5);
+        }
+    );
+
+    std::vector<Triangle> cube1{
+        {vertices1[0], vertices1[6], vertices1[4]},
+        {vertices1[0], vertices1[2], vertices1[6]},
+        {vertices1[0], vertices1[3], vertices1[2]},
+        {vertices1[0], vertices1[1], vertices1[3]},
+        {vertices1[2], vertices1[7], vertices1[6]},
+        {vertices1[2], vertices1[3], vertices1[7]},
+        {vertices1[4], vertices1[6], vertices1[7]},
+        {vertices1[4], vertices1[7], vertices1[5]},
+        {vertices1[0], vertices1[4], vertices1[5]},
+        {vertices1[0], vertices1[5], vertices1[1]},
+        {vertices1[1], vertices1[5], vertices1[7]},
+        {vertices1[1], vertices1[7], vertices1[3]},
+    };
+
+    std::vector<Triangle> cube2{
+        {vertices2[0], vertices2[6], vertices2[4]},
+        {vertices2[0], vertices2[2], vertices2[6]},
+        {vertices2[0], vertices2[3], vertices2[2]},
+        {vertices2[0], vertices2[1], vertices2[3]},
+        {vertices2[2], vertices2[7], vertices2[6]},
+        {vertices2[2], vertices2[3], vertices2[7]},
+        {vertices2[4], vertices2[6], vertices2[7]},
+        {vertices2[4], vertices2[7], vertices2[5]},
+        {vertices2[0], vertices2[4], vertices2[5]},
+        {vertices2[0], vertices2[5], vertices2[1]},
+        {vertices2[1], vertices2[5], vertices2[7]},
+        {vertices2[1], vertices2[7], vertices2[3]},
+    };
+
+    Octree tree1(cube1);
+    Octree tree2(cube2);
+
+    REQUIRE(tree1.collides(&tree2));
+}
+\end{cppSource}

@@ -1,0 +1,85 @@
+\documentclass[croatian, 12pt]{report}
+
+\usepackage[a4paper]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{babel}
+\usepackage{hyphsubst}
+\usepackage{titlesec}
+\usepackage{listings}
+\usepackage{svg}
+\usepackage[most]{tcolorbox}
+\usepackage{inconsolata}
+\usepackage{csquotes}
+\usepackage[shortlabels]{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage[backend=biber,style=numeric,url=true,sorting=none]{biblatex}
+\usepackage{subfig}
+\addbibresource{references.bib}
+\bibliography{references.bib}
+
+\titleformat{\chapter}[hang] 
+{\normalfont\huge\bfseries}{\thechapter}{1em}{} 
+
+\hypersetup{
+    linktoc=all
+}
+
+\newtcblisting[auto counter, number within=chapter, number freestyle={\noexpand\thechapter.\noexpand\arabic{\tcbcounter}}]{pythonSource}[2][]{
+    sharp corners, 
+    fonttitle=\bfseries,
+    colframe=gray,
+    listing only, 
+    listing options={basicstyle=\scriptsize\ttfamily,language=python}, 
+    title=Primjer \thetcbcounter: #2, #1
+}
+\newtcblisting[auto counter, number within=chapter, number freestyle={\noexpand\thechapter.\noexpand\arabic{\tcbcounter}}]{cppSource}[2][]{
+    sharp corners, 
+    fonttitle=\bfseries,
+    colframe=gray,
+    listing only, 
+    listing options={basicstyle=\scriptsize\ttfamily,language=c++}, 
+    title=Primjer \thetcbcounter: #2, #1
+}
+
+\graphicspath{ {images/} }
+
+\title{
+{Završni rad}\\
+\vspace{10pt}
+{
+    Ubrzavanje geometrijskih operacija metodom 
+    oktalnog stabla i prostornog hashiranja
+}
+}
+\author{Adriano Dijan}
+\date{Rujan 2022}
+
+
+\begin{document}
+
+\begin{center}
+    \MakeUppercase{
+        \large\textbf{
+            Sveučilište u Splitu\\
+            Fakultet elektrotehnike, strojarstva i brodogradnje
+        }
+    }
+\end{center}
+
+{\let\newpage\relax\maketitle}
+
+\newgeometry{top=3cm}
+\tableofcontents
+\restoregeometry
+
+\include{chapters/01-uvod.tex}
+\include{chapters/02-tehnologije.tex}
+\include{chapters/03-oktalno-stablo.tex}
+\include{chapters/04-prostorno-hashiranje.tex}
+\include{chapters/05-testiranje performansi.tex}
+\include{chapters/06-gui.tex}
+\include{chapters/07-zakljucak.tex}
+\printbibliography[heading=bibintoc, title=Literatura]
+
+\end{document}
