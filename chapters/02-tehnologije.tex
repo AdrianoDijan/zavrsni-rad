@@ -27,7 +27,35 @@ Conan je upravitelj paketa za C/C++ programske jezike. Omogućava preuzimanje bi
 i njihovu automatsku integraciju u programski kod. Moguće ga je integrirati sa CMake sustavom kako bi se postiglo automatsko
 prevođenje i povezivanje potrebnih biblioteka sa izvornim kodom. Koristeći datoteku \textit{conanfile.py} moguće je definirati
 skup pravila po kojima će se biblioteka ili programski paket prevoditi i pakirati, a takav paket je onda moguće koristiti lokalno
-ili ga objaviti na javno dostupnom Conan repozitoriju.
+ili ga objaviti na javno dostupnom Conan repozitoriju. \\
+
+\textit{conanfile.py} datototeka je python izvršna datoteka koja koristi conans biblioteku za konfiguraciju Conan upravitelja paketa.
+Informacije o paketu konfiguriramo kao varijable klase (u primjeru YAAACDConan) koja nasljeđuje klasu ConanFile.\\
+Neki od konfiguracijskih parametara:
+\begin{itemize}
+  \item \textbf{name} - naziv paketa
+  \item \textbf{version} - željena verzija paketa
+  \item \textbf{settings} - parametri koji utječu na kompajliranje paketa\\
+      Conan stvara hash vrijednosti koje se nalaze u \textit{settings} varijabli, te prema njima odlučuje treba li paket kompajlirati
+      za neku platformu ili je moguće koristiti već kompajliranu verziju.
+  \item \textbf{exports\_sources} - popis datoteka i mapa izvornog koda koje su potrebne za kompajliranje
+\end{itemize} 
+
+\pagebreak
+Kako bi iz datoteka izvornog koda bilo moguće stvoriti biblioteku ili izvršnu datoteku, u datoteci \textit{conanfile.py} potrebno je definirati
+funkcije koje su odgovorne za proces stvaranja paketa.
+Potrebne funkcije:
+\begin{itemize}
+  \item \textbf{build} - izvršava se pri pozivu \textit{conan build} naredbe\\
+      Konfigurira CMake alat i pokreće \textit{build} - proces kompajliranja i povezivanja.
+  \item \textbf{package} - izvršava se pri pozivu \textit{conan package} naredbe\\
+      Pakira datoteke izvornog koda u Conan paket. Ako projekt koristi CMake,
+      događa se poziv ekvivalentan \textit{cmake --install} u Conan virtualnom okruženju.
+\end{itemize}
+
+U primjeru 2.1 definirana je i funkcija \textit{\_configure\_cmake} - pomoćna funkcija koja konfigurira radno okruženje i priprema ga za
+kompajliranje paketa.
+
 
 \begin{pythonSource}{Primjer konfiguracijske datoteke (\textit{conanfile.py})}
 from conans import ConanFile, CMake
@@ -36,6 +64,7 @@ from conans import ConanFile, CMake
 class YAAACDConan(ConanFile):
     name = "yaaacd"
     version = "1.0"
+
     settings = "os", "compiler", "arch", "build_type"
     options = {"shared": [True, False]}
     default_options = "shared=False"
@@ -47,6 +76,8 @@ class YAAACDConan(ConanFile):
         "test/*"
     )
 
+    def _configure_cmake(self):
+        cmake = CMake(self)
         cmake.definitions["CMAKE_BUILD_TYPE"] = str(
             self.settings.build_type
         ).upper()
@@ -75,6 +106,15 @@ Omogućava jednostavno pisanje jediničnih testova uz korištenje dostupnih
 \textit{macro}-a, automatsku registraciju testova i testove performansi.
 Integrira se sa CMake paketom te ga je moguće koristiti sa CTest alatom
 za testiranje.
+
+Testovi se pišu u obliku C++ funkcija, s razlikom da definicija funkcije nema standardni oblik
+\textit{<tip> naziv\_funkcije(argumenti...)}, već se koristi \textit{macro TEST\_CASE} kojem su argumenti
+naziv testa i popis \textit{tagova} (Oznaka koje omogućavaju filtriranje testova kod kasnijeg izvršavanja, izrade izvještaja...). \\
+Primjer 2.1 prikazuje test koji provjerava sudar među dvije \textit{Octree} strukture. Prvi dio funkcije je standardni C++ kod u kojem se
+definiraju varijable potrebne za test, dok je odluka o uspješnosti testa definira koristeći \textit{REQUIRE macro}. \textit{REQUIRE macro}
+funkcionira tako da testove smatra uspješnima ako je vrijednost argumenta istinita.
+Uz \textit{REQUIRE}, dostupan je i \textit{REQUIRE\_FALSE} koji provjerava da je vrijednost u argumentu lažna.
+
 
 \begin{cppSource}{Primjer Catch2 jediničnog testa}
 TEST_CASE("Test octree collision", "[octree]") {
@@ -137,3 +177,41 @@ TEST_CASE("Test octree collision", "[octree]") {
     REQUIRE(tree1.collides(&tree2));
 }
 \end{cppSource}
+
+
+\section{Podešavanje radne okoline}
+
+Projekt se sastoji od dva C++ paketa - biblioteke YAAACD i izvršnog programa YAAACD-GUI. Kako bi bilo moguće
+kompajlirati i pokrenuti projekt, potrebno je konfigurirati radno okruženje za oba paketa.\\
+
+Izvorni kod biblioteke nalazi se u GitHub repozitoriju \url{https://github.com/AdrianoDijan/yaaacd}.
+Kako bi bilo moguće konfigurirati radnu okolinu, potrebno je imati instaliran Conan upravitelj paketa i CMake.
+Conan se može preuzeti na \url{https://conan.io/downloads.html}, a CMake na \url{https://cmake.org/download/}.
+Oba programa dostupna su za sve veće operacijske sustave (Linux, macOS, Windows), te se mogu preuzeti
+i kroz sistemske upravitelje paketa (apt, pacman, brew, winget...).\\
+
+Nakon što su oba paketa instalirana, potrebno je konfigurirati okolinu
+za kompajliranje (\textit{engl. build environment}) na sljedeći način:
+
+\begin{enumerate}
+  \item U radnom direktoriju napraviti mapu \textit{build}
+  \item Unutar mape \textit{build} pokrenuti naredbu \textit{conan install ..}
+  \item Unutar iste mape pokrenuti \textit{conan package ..} te \textit{conan export ..}\\
+      \textit{conan export ..} zapisat će paket u lokalnu predmemoriju kako bi ga \textit{YAAACD-GUI} mogao instalirati.
+      Naredba \textit{conan package ..} pokrenut će kompajliranje biblioteke, a nakon uspješnog kompajliranja pokrenut će
+      se i jedinični testovi.
+\end{enumerate}
+
+Nakon podešavanja i kompajliranja biblioteke YAAACD, potrebno je kompajlirati i GUI aplikaciju.
+Izvorni kod potrebno je preuzeti iz GitHub repozitorija \url{https://github.com/AdrianoDijan/yaaacd-gui}.
+U direktoriju u kojem je preuzet izvorni kod, potrebno je napraviti sljedeće korake:
+
+\begin{enumerate}
+  \item U radnom direktoriju napraviti mapu \textit{build}
+  \item Unutar mape \textit{build} pokrenuti naredbu \textit{cmake ..}
+  \item Unutar iste mape pokrenuti \textit{cmake --build . (--parallel)} - opcionalno, ako 
+    želimo da se za kompajliranje koristi više procesorskih niti
+\end{enumerate}
+
+Nakon kompajliranja, izvršna datoteka naziva \textit{yaaacd-gui} bit će dostupna u mapi \textit{build}.
+Program prima 2 argumenta - nazive datoteka koje sadrže modele koje želimo testirati za sudare.

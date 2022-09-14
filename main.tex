@@ -1,6 +1,12 @@
 \documentclass[croatian, 12pt]{report}
 
+\usepackage[scaled]{helvet}
+\renewcommand\familydefault{\sfdefault} 
+\usepackage[T1]{fontenc}
+
 \usepackage[a4paper]{geometry}
+\usepackage{pdfpages}
+\usepackage{setspace}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \usepackage{babel}
@@ -9,6 +15,7 @@
 \usepackage{listings}
 \usepackage{svg}
 \usepackage[most]{tcolorbox}
+\tcbuselibrary{listingsutf8}
 \usepackage{inconsolata}
 \usepackage{csquotes}
 \usepackage[shortlabels]{enumitem}
@@ -44,35 +51,60 @@
 
 \graphicspath{ {images/} }
 
-\title{
-{Završni rad}\\
-\vspace{10pt}
-{
-    Ubrzavanje geometrijskih operacija metodom 
-    oktalnog stabla i prostornog hashiranja
-}
-}
-\author{Adriano Dijan}
-\date{Rujan 2022}
-
-
 \begin{document}
 
-\begin{center}
-    \MakeUppercase{
-        \large\textbf{
-            Sveučilište u Splitu\\
-            Fakultet elektrotehnike, strojarstva i brodogradnje
-        }
+\pagestyle{empty}
+\begin{titlepage}
+    {
+        \fontsize{18}{21}\selectfont
+        \begin{center}
+            \MakeUppercase{
+                \textbf{
+                    Sveučilište u Splitu\\
+                    Fakultet elektrotehnike, strojarstva i brodogradnje\\
+                }
+            }
+            \vspace{4cm}
+            \MakeUppercase{\textbf{Završni rad}}
+        \end{center}
     }
-\end{center}
+    \vspace{2cm}
+    {\fontsize{22}{26}\selectfont
+        \begin{center}
+            \MakeUppercase{
+                \textbf{
+                    Ubrzavanje geometrijskih operacija metodom
+                    oktalnog stabla i prostornog hashiranja
+                }
+            }
+        \end{center}
+    }
+    \vspace{4cm}
+    {\fontsize{18}{21}\selectfont
+        \begin{center}
+            \textbf{Adriano Dijan}
+        \end{center}
+    }
+    \vspace{2cm}
+    {\fontsize{16}{19}\selectfont
+        \begin{center}
+            Split, Rujan 2022.
+        \end{center}
+    }
+    
+\end{titlepage}
 
-{\let\newpage\relax\maketitle}
 
-\newgeometry{top=3cm}
+\includepdf[pages=-]{izjava.pdf}
+\includepdf[pages=-]{zadatak.pdf}
+
+\newgeometry{top=1cm}
+\addtocontents{toc}{\protect\thispagestyle{empty}}
 \tableofcontents
 \restoregeometry
 
+\pagestyle{plain}
+\pagenumbering{arabic}
 \include{chapters/01-uvod.tex}
 \include{chapters/02-tehnologije.tex}
 \include{chapters/03-oktalno-stablo.tex}
@@ -81,5 +113,6 @@
 \include{chapters/06-gui.tex}
 \include{chapters/07-zakljucak.tex}
 \printbibliography[heading=bibintoc, title=Literatura]
+\include{chapters/08-sazetak.tex}
 
 \end{document}

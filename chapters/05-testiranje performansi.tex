@@ -135,3 +135,25 @@ Rezultati su prikazani u tablici \ref{table:testresults}
   \caption{Rezultati testiranja}
   \label{table:testresults}
 \end{table}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=16cm]{chart.png}
+    \caption {Grafički prikaz rezultata testova}
+    \label{testresults}
+\end{figure}
+
+\pagebreak
+
+Rezultati su izračunati kao srednja vrijednost deset uzastopnih mjerenja svakog od testnih slučajeva.\\
+Kod metode oktalnog stabla, vidljivo je najbolje poboljšanje u performansama. Za slučajeve kad se
+ni objekti ni njihovi \textit{AABB}-ovi ne sijeku, trajanje testa je manje od jedne milisekunde.
+Takav rezultat za takve slučajeve proizlazi iz činjenice da je, u slučajevima kad nema sudara među
+\textit{AABB}-ovima, dovoljna samo jedna provjera kako bi se zaključilo da nema sudara među objektima.
+U slučajevima kad se objekti ili njihovi \textit{AABB}-ovi sijeku, vidljiva je veća ovisnost trajanja
+testa o veličini modela, jer je i broj provjera sudara \textit{AABB}-ova i trokuta veći.\\
+Kod metode prostornog hashiranja, najveće poboljšanje u performansama, suprotno od metode oktalnog stabla,
+postoji u onim slučajevima kad se objekti sudaraju. Zbog izvedbe prostornog hashiranja koja je korištena u
+ovom radu, kad sudar ne postoji, algoritam prolazi kroz sve \textit{AABB}-ove drugog objekta. Ako sudar
+postoji, dovoljno je da algoritam otkrije jedan par primitiva (trokuta) koji se sijeku kako bi bila
+donesena odluka, pa je zato u takvim slučajevima trajanje testa manje.

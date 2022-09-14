@@ -3,17 +3,34 @@
 
 Prostorno hashiranje je metoda reprezentiranja trodimenzionalnog prostora u
 jednodimenzionalnoj hash tablici. Temelji se na fiksnoj podjeli prostora na
-\textit{AABB}-ove i raspodjelu istih tih \textit{AABB}-ova u čelije tablice. ~\cite{gamedev}
+\textit{AABB}-ove i raspodjelu istih tih \textit{AABB}-ova u čelije tablice (Slika \ref{figure:spatial}). ~\cite{gamedev}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=12cm]{spatial.png}
+    \caption {Pojednostavljeni 2D prikaz preslikavanja u hash tablicu.}
+    \label{figure:spatial}
+\end{figure}
 
 \section{Priprema strukture za hashiranje}
 
 Konstruktor hash tablice, kao i konstruktor \textit{Octree} strukture, kao argumente
 prima mrežu trokuta od kojih je napravljen trodimenzionalni objekt, kao i željenu
 dubinu podjele prostora. Za razliku od oktalnog stabla, kod prostornog hashiranja
-ne događa se rekurzivna podjela prostora na oktante, već se prostor podijeli na
-fiksni broj \[n = 2^{(3\cdot l)}\] \textit{AABB}-ova, gdje je \textit{l} broj
-željenih razina podjele. \\ Na primjer, ako želimo prostor podijeliti 5 puta,
-broj \textit{AABB}-ova bit će 32768.
+prolazak kroz strukturu ne događa se rekurzivno, već su nakon prve rekurzivne podjele
+prostora svi \textit{AABB}-ovi poznati.
+Prostor se dijeli na \[n = 2^{(d\cdot l)}\] \textit{AABB}-ova.
+Broj $d$ označava broj dimenzija, dok $l$ predstavlja koliko puta će se taj prostor
+prepoloviti po svakoj svojoj dimenziji.\\
+Na primjeru (Slika \ref{partitioning}):\\
+Broj dimenzija $d$ je 2, a originalni \textit{AABB} smo odlučili prepoloviti dva puta, pa je rezultantni broj \textit{AABB}-ova 16 ($n = 2^{2*2}$)
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=12cm]{partitioning.png}
+    \caption {Prikaz podjele prostora u dvije dimenzije}
+    \label{partitioning}
+\end{figure}
 
 \begin{cppSource}{Implementacija funkcije za podjelu prostora}
 std::vector<BoundingBox *>

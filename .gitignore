@@ -520,3 +520,5 @@ Temporary Items
 *.code-workspace
 
 *.pdf
+
+!images/*.pdf
