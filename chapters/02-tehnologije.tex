@@ -207,6 +207,10 @@ Izvorni kod potrebno je preuzeti iz GitHub repozitorija \url{https://github.com/
 U direktoriju u kojem je preuzet izvorni kod, potrebno je napraviti sljedeće korake:
 
 \begin{enumerate}
+  \item Prije kompajliranja potrebno je u Conan dodati Qt repozitorij, kako bi bilo moguće preuzeti Qt pakete.\\
+      Kako bi se mogli koristiti Qt Conan repozitorijem, potrebno je registrirati se na \url{https://my.qt.io},
+      te prema uputama sa \url{https://wiki.qt.io/Using_Conan_for_Qt6#Connecting_to_Conan_remote}, konfigurirati
+      Conan da koristi taj repozitorij.
   \item U radnom direktoriju napraviti mapu \textit{build}
   \item Unutar mape \textit{build} pokrenuti naredbu \textit{cmake ..}
   \item Unutar iste mape pokrenuti \textit{cmake --build . (--parallel)} - opcionalno, ako 
